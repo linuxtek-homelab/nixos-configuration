@@ -10,11 +10,10 @@
       ./hardware-configuration.nix
     ];
 
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
-
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  
   # Define Kernel Package - Latest Stable kernel.org version
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -100,6 +99,7 @@
     firefox
     gimp
     git
+    gnome.cheese
     libreoffice
     lutris
     neofetch
@@ -110,12 +110,13 @@
     steam
     ungoogled-chromium
     samba
-    slack    
+    slack
     terraform
     vim
     vlc
     vscode
     wget
+    xfce.thunar
     yt-dlp
   ];
 
