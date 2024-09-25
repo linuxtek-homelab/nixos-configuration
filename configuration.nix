@@ -18,14 +18,14 @@
   # Define Kernel Package - Latest Stable kernel.org version
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  
   # Add NAS Mount Shares
   fileSystems."/home/keitarou/Mounts/NAS" = {
     device = "//192.168.2.50/NAS";
     fsType = "cifs";
     options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-    in ["${automount_opts},credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
+    # this line prevents hanging on network split
+    automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+    in ["${automount_opts},vers=3.0,credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
   };
 
  # Add Media Mount Shares
@@ -33,12 +33,11 @@
     device = "//192.168.2.50/Media";
     fsType = "cifs";
     options = let
-      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-    in ["${automount_opts},credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
+    # this line prevents hanging on network split
+    automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+    in ["${automount_opts},vers=3.0,credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
   };
 
- 
-     
   # Global Settings - Enable Flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
@@ -112,6 +111,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    cifs-utils
     cpufrequtils
     curl
     dmidecode
@@ -126,6 +126,7 @@
     gparted
     htop
     imagemagick
+    jq
     gnome.cheese
     libreoffice
     lutris
