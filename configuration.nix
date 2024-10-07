@@ -4,6 +4,20 @@
 
 { config, pkgs, ... }:
 
+let
+
+  # Samba Share Mount Options
+  # Credenetials are stored in root only accessible file
+  cifsMountOptions = [
+    "vers=3.0"
+    "credentials=/etc/nixos/smb-secrets"
+    "uid=1000"
+    "gid=100"
+    "file_mode=0777"
+    "dir_mode=0777"
+  ];
+in
+
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -22,20 +36,14 @@
   fileSystems."/home/keitarou/Mounts/NAS" = {
     device = "//192.168.2.50/NAS";
     fsType = "cifs";
-    options = let
-    # this line prevents hanging on network split
-    automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-    in ["${automount_opts},vers=3.0,credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
+    options = cifsMountOptions; 
   };
 
  # Add Media Mount Shares
   fileSystems."/home/keitarou/Mounts/Media" = {
     device = "//192.168.2.50/Media";
     fsType = "cifs";
-    options = let
-    # this line prevents hanging on network split
-    automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-    in ["${automount_opts},vers=3.0,credentials=/etc/nixos/smb-secrets,uid=1000,gid=100"];
+    options = cifsMountOptions;
   };
 
   # Global Settings - Enable Flakes
@@ -68,9 +76,9 @@
   services.xserver.desktopManager.xfce.enable = true;
 
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Enable CUPS to print documents.
