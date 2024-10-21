@@ -126,6 +126,7 @@ in
     discord
     docker
     docker-client
+    ffmpeg-full
     firefox
     gedit
     gimp
@@ -141,6 +142,7 @@ in
     neofetch
     neovim
     nfs-utils
+    openrgb-with-all-plugins
     openssh
     python3
     steam
@@ -148,6 +150,7 @@ in
     slack
     terraform
     unzip
+    usbutils
     vim
     vlc
     vscode
