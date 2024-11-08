@@ -22,7 +22,7 @@ in
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./xfce.nix
+      ./xfce.nix      
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -108,7 +108,7 @@ in
   users.users.keitarou = {
     isNormalUser = true;
     description = "Keitarou Urashima";
-    extraGroups = [ "networkmanager" "wheel" "docker"];
+    extraGroups = [ "networkmanager" "wheel" "docker" "audio"];
     packages = with pkgs; [      
     ];
   };
