@@ -85,7 +85,7 @@ in
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
+  sound.enable = false;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -93,12 +93,13 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
+    jack.enable = true;
+    extraConfig.pipewire."fiio-config" = { 
+      "context.properties" = {
+        "default.clock.rate" = 192000; # Default sample rate in Hz
+        "default.clock.allowed-rates" = [ 48000 44100 ]; # Allowed rate
+      };
+    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -119,6 +120,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    alsa-utils
     cifs-utils
     cpufrequtils
     curl
@@ -138,19 +140,24 @@ in
     jq
     gnome.cheese
     libreoffice
+    lsof
     lutris
     neofetch
     neovim
     nfs-utils
     openrgb-with-all-plugins
     openssh
+    p7zip
     python3
+    rpi-imager
     steam
     samba
     slack
+    solaar
     terraform
     unzip
     usbutils
+    ventoy-full
     vim
     vlc
     vscode
