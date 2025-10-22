@@ -81,12 +81,21 @@ in
     variant = "";
   };
 
-  # Enable CUPS to print documents.
+  # Enable CUPS to print documents
   services.printing.enable = true;
 
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  # Add drivers for Brother Laser Printers
+  services.printing.drivers = [ pkgs.brlaser ];
+
   # Enable sound with pipewire.
-  sound.enable = false;
-  hardware.pulseaudio.enable = false;
+  #sound.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -121,16 +130,21 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     alsa-utils
+    brave
     cifs-utils
     cpufrequtils
     curl
     dmidecode
+    dig
     discord
     docker
     docker-client
+    elementary-xfce-icon-theme
     ffmpeg-full
     firefox
     gedit
+    ghostscript
+    ghostscript_headless
     gimp
     git
     google-chrome
@@ -138,8 +152,11 @@ in
     htop
     imagemagick
     jq
-    gnome.cheese
+    cheese
+    htop
+    libsForQt5.okular
     libreoffice
+    loupe
     lsof
     lutris
     neofetch
@@ -147,27 +164,42 @@ in
     nfs-utils
     openrgb-with-all-plugins
     openssh
+    openssl
     p7zip
+    pdfarranger
     python3
     rpi-imager
     steam
     samba
+    signal-desktop
     slack
     solaar
     terraform
     unzip
     usbutils
-    ventoy-full
     vim
     vlc
     vscode
+    wakeonlan
     wget
     xfce.thunar
+    xfce.xfce4-icon-theme
     yt-dlp
   ];
 
+  # Allow specific insecure packages
+  # Ventoy includes binary blobs
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "ventoy-1.1.05"
+  ];
+
+
   # Enable nix-ld for dynamic linking (VS Code Fix)
   programs.nix-ld.enable = true;
+
+  # Enable Steam for GLX Libraries
+  programs.steam.enable = true;
 
   # Automatic Garbage Collection
   nix.gc = {
