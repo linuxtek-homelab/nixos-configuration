@@ -25,6 +25,12 @@ in
       ./xfce.nix      
     ];
 
+  system.autoUpgrade = {
+    enable = true;
+    allowReboot = true;
+    channel = "https://channels.nixos.org/nixos-25.11";
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -154,11 +160,12 @@ in
     jq
     cheese
     htop
-    libsForQt5.okular
+    kdePackages.okular    
     libreoffice
     loupe
     lsof
     lutris
+    moonlight-qt
     neofetch
     neovim
     nfs-utils
@@ -168,7 +175,6 @@ in
     p7zip
     pdfarranger
     python3
-    rpi-imager
     steam
     samba
     signal-desktop
@@ -177,6 +183,7 @@ in
     terraform
     unzip
     usbutils
+    #ventoy-full
     vim
     vlc
     vscode
