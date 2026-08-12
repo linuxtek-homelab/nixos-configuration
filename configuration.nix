@@ -27,7 +27,7 @@ in
 
   system.autoUpgrade = {
     enable = true;
-    allowReboot = true;
+    allowReboot = false;
     channel = "https://channels.nixos.org/nixos-25.11";
   };
 
@@ -50,6 +50,13 @@ in
     device = "//192.168.2.50/Media";
     fsType = "cifs";
     options = cifsMountOptions;
+  };
+
+ # Add NAS Mount Shares
+  fileSystems."/home/keitarou/Mounts/Surveilance" = {
+    device = "//192.168.2.50/Surveilance";
+    fsType = "cifs";
+    options = cifsMountOptions; 
   };
 
   # Global Settings - Enable Flakes
@@ -111,11 +118,17 @@ in
     jack.enable = true;
     extraConfig.pipewire."fiio-config" = { 
       "context.properties" = {
-        "default.clock.rate" = 192000; # Default sample rate in Hz
-        "default.clock.allowed-rates" = [ 48000 44100 ]; # Allowed rate
+        "default.clock.allowed-rates" = [ 44100 48000 88200 96000 176400 192000 ];
       };
     };
   };
+
+  # Extra rule for FiiO Low Power USB:
+
+  services.udev.extraRules = ''
+  # Disable autosuspend specifically for FiiO BTR5 (2972:0047)
+  ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2972", ATTR{idProduct}=="0047", ATTR{power/control}="on"
+  '';
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -135,6 +148,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    audacious
     alsa-utils
     brave
     cifs-utils
@@ -146,6 +160,7 @@ in
     docker
     docker-client
     elementary-xfce-icon-theme
+    fastfetch
     ffmpeg-full
     firefox
     gedit
@@ -159,23 +174,30 @@ in
     imagemagick
     jq
     cheese
+    hashcat
+    hcxdumptool
+    hcxtools
     htop
     kdePackages.okular    
-    libreoffice
+    libreoffice    
     loupe
     lsof
     lutris
     moonlight-qt
-    neofetch
+    mtr    
     neovim
+    nmap
     nfs-utils
+    openjdk
     openrgb-with-all-plugins
     openssh
     openssl
     p7zip
     pdfarranger
     python3
+    rpi-imager
     steam
+    steam-run
     samba
     signal-desktop
     slack
@@ -193,6 +215,27 @@ in
     xfce.xfce4-icon-theme
     yt-dlp
   ];
+
+  programs.nix-ld.libraries = with pkgs; [
+    xorg.libX11
+    xorg.libXext
+    xorg.libXrender
+    xorg.libXtst
+    xorg.libXi
+    zlib
+    freetype
+    alsa-lib
+];
+ 
+  fonts = {
+    fontconfig.enable = true;
+    packages = with pkgs; [
+      dejavu_fonts
+      freefont_ttf
+      liberation_ttf
+    ];
+  };
+
 
   # Allow specific insecure packages
   # Ventoy includes binary blobs
