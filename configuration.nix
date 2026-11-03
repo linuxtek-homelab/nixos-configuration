@@ -88,6 +88,9 @@ in
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
 
+  # Enable QMK udev rules (covers Keychron QMK/VIA vendor IDs)
+  hardware.keyboard.qmk.enable = true;
+  
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -106,6 +109,27 @@ in
   # Add drivers for Brother Laser Printers
   services.printing.drivers = [ pkgs.brlaser ];
 
+  # Force Linux kernel 7.0 to use 'xe' instead of 'i915' for Alder Lake-P (46a6)
+  boot.kernelParams = [
+    "i915.force_probe=!46a6"
+    "xe.force_probe=46a6"
+  ];
+
+  # Graphics drivers and userspace hardware acceleration
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+
+    extraPackages = with pkgs; [
+      intel-media-driver    # VA-API driver for Gen8+ / Alder Lake
+      vpl-gpu-rt            # Quick Sync Video (QSV) runtime
+      intel-compute-runtime # OpenCL runtime
+    ];
+  };
+
+  # Standard display server driver
+  services.xserver.videoDrivers = [ "modesetting" ];
+
   # Enable sound with pipewire.
   #sound.enable = false;
   services.pulseaudio.enable = false;
@@ -123,11 +147,13 @@ in
     };
   };
 
-  # Extra rule for FiiO Low Power USB:
-
+# Extra rule for FiiO Low Power USB:
   services.udev.extraRules = ''
-  # Disable autosuspend specifically for FiiO BTR5 (2972:0047)
-  ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2972", ATTR{idProduct}=="0047", ATTR{power/control}="on"
+    # Disable autosuspend specifically for FiiO BTR5 (2972:0047)
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2972", ATTR{idProduct}=="0047", ATTR{power/control}="on"
+    
+    # Keychron K9 Pro (and QMK-based Keychron boards) - Full HID access for local user
+    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", MODE="0660", TAG+="uaccess"
   '';
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -137,10 +163,13 @@ in
   users.users.keitarou = {
     isNormalUser = true;
     description = "Keitarou Urashima";
-    extraGroups = [ "networkmanager" "wheel" "docker" "audio"];
+    extraGroups = [ "networkmanager" "wheel" "docker" "audio" "plugdev" "input"];
     packages = with pkgs; [      
     ];
   };
+  
+  # Add group for udev
+  users.groups.plugdev = {};
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -151,6 +180,7 @@ in
     audacious
     alsa-utils
     brave
+    cheese
     cifs-utils
     cpufrequtils
     curl
@@ -159,6 +189,7 @@ in
     discord
     docker
     docker-client
+    dosbox
     elementary-xfce-icon-theme
     fastfetch
     ffmpeg-full
@@ -171,16 +202,18 @@ in
     google-chrome
     gparted
     htop
-    imagemagick
-    jq
-    cheese
     hashcat
     hcxdumptool
     hcxtools
     htop
-    kdePackages.okular    
+    imagemagick
+    iperf3
+    jq
+    kdePackages.okular
+    keychron-udev-rules    
     libreoffice    
     loupe
+    lshw
     lsof
     lutris
     moonlight-qt
@@ -193,18 +226,24 @@ in
     openssh
     openssl
     p7zip
+    pciutils
     pdfarranger
     python3
+    qmk
+    qmk-udev-rules
     rpi-imager
     steam
     steam-run
     samba
     signal-desktop
     slack
-    solaar
+    sweethome3d.application
     terraform
+    umu-launcher
+    umu-launcher-unwrapped
     unzip
     usbutils
+    uzdoom
     #ventoy-full
     vim
     vlc
